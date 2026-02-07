@@ -16,7 +16,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Estilos CSS
+# Estilos CSS (VISUALES)
 st.markdown("""
     <style>
     /* Ocultar elementos de Streamlit */
@@ -24,20 +24,43 @@ st.markdown("""
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* Estilo General */
-    .stApp {background-color: #f8f9fa;}
-    
-    /* Tarjetas */
-    .metric-card {
-        background-color: white;
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        text-align: center;
-        margin-bottom: 10px;
+    /* 1. Fondo de la Aplicación (Gris suave para contraste) */
+    .stApp {
+        background-color: #eceff1;
     }
     
-    /* Botones */
+    /* 2. Tarjetas Blancas (Métricas y Contenido) */
+    .metric-card {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 15px;
+        border: 1px solid #e0e0e0;
+    }
+    
+    /* 3. Texto dentro de las tarjetas (Forzamos color oscuro) */
+    .metric-card h3 {
+        color: #2E7D32 !important; /* Verde Institucional */
+        margin: 0;
+        font-size: 28px;
+        font-weight: 800;
+    }
+    .metric-card small {
+        color: #546E7A !important; /* Gris Oscuro */
+        font-size: 14px;
+        font-weight: 500;
+    }
+    .metric-card h4 {
+        color: #37474F !important;
+        font-size: 16px;
+    }
+    .metric-card p {
+        color: #455A64 !important;
+    }
+    
+    /* 4. Botones */
     .stButton>button {
         width: 100%;
         border-radius: 12px;
@@ -46,6 +69,7 @@ st.markdown("""
         background-color: #2E7D32;
         color: white;
         border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .stButton>button:hover {
         background-color: #1B5E20;
@@ -63,18 +87,15 @@ class EcoBlock:
         self.index = index
         self.timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self.transaction = transaction
-        self.amount = amount # Guardamos el monto para graficar
+        self.amount = amount 
         self.prev_hash = prev_hash
         self.hash = self.calculate_hash()
 
     def calculate_hash(self):
-        # Hash único basado en contenido
         block_string = f"{self.index}{self.timestamp}{self.transaction}{self.amount}{self.prev_hash}"
         return hashlib.sha256(block_string.encode()).hexdigest()
 
-# Inicialización de Estado
 if 'chain' not in st.session_state:
-    # Bloque Génesis (Saldo inicial)
     genesis = EcoBlock(0, "Saldo Inicial", 12.50, "0")
     st.session_state.chain = [genesis]
 
@@ -96,9 +117,9 @@ selected = option_menu(
     default_index=0,
     orientation="horizontal",
     styles={
-        "container": {"padding": "0!important", "background-color": "#fff"},
+        "container": {"padding": "5px", "background-color": "#ffffff", "border-radius": "15px", "box-shadow": "0 4px 6px rgba(0,0,0,0.1)"},
         "icon": {"color": "#2E7D32", "font-size": "16px"}, 
-        "nav-link": {"font-size": "11px", "text-align": "center", "margin": "0px"},
+        "nav-link": {"font-size": "11px", "text-align": "center", "margin": "0px", "color": "#455A64"},
         "nav-link-selected": {"background-color": "#2E7D32", "color": "white"},
     }
 )
@@ -107,29 +128,43 @@ selected = option_menu(
 # 4. PANTALLAS
 # ==========================================
 
-# --- INICIO ---
+# --- INICIO (CORREGIDO) ---
 if selected == "Inicio":
-    st.markdown(f"### Hola, {st.session_state.user['name']} 👋")
+    # Encabezado oscuro para que se lea bien sobre fondo claro
+    st.markdown(f"<h3 style='color:#37474F;'>Hola, {st.session_state.user['name']} 👋</h3>", unsafe_allow_html=True)
     
-    # Tarjeta de Saldo Principal
+    # Tarjeta de Saldo Principal (Fondo Verde, Texto Blanco)
     st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #2E7D32 0%, #66BB6A 100%); padding: 25px; border-radius: 15px; color: white; margin-bottom: 20px; text-align: center; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);">
-        <small style="opacity: 0.9">Saldo Disponible</small>
-        <h1 style="margin: 5px 0; font-size: 36px;">{st.session_state.user['tokens']:.2f} ECOG</h1>
-        <div style="background: rgba(255,255,255,0.2); display: inline-block; padding: 2px 10px; border-radius: 10px;">
-            <small>Nivel: {st.session_state.user['nivel']}</small>
+    <div style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); padding: 25px; border-radius: 20px; color: white; margin-bottom: 20px; text-align: center; box-shadow: 0 10px 20px rgba(46, 125, 50, 0.3);">
+        <small style="opacity: 0.9; color: #E8F5E9;">Saldo Disponible</small>
+        <h1 style="margin: 5px 0; font-size: 42px; color: white;">{st.session_state.user['tokens']:.2f} ECOG</h1>
+        <div style="background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 15px; border-radius: 15px; margin-top: 10px;">
+            <small style="color: white; font-weight: bold;">Nivel: {st.session_state.user['nivel']}</small>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
     botellas = st.session_state.user['botellas']
-    st.progress(min(botellas/200, 1.0), text=f"Meta: {botellas}/200 Botellas")
+    st.progress(min(botellas/200, 1.0), text=f"Meta Nivel: {botellas}/200 Botellas")
     
+    # Tarjetas de Métricas (Fondo Blanco, Texto Oscuro)
     c1, c2 = st.columns(2)
-    c1.markdown(f"<div class='metric-card'><h3>♻️ {botellas}</h3><small>Recicladas</small></div>", unsafe_allow_html=True)
-    c2.markdown(f"<div class='metric-card'><h3>🌳 {botellas*0.03:.1f}kg</h3><small>CO2 Ahorrado</small></div>", unsafe_allow_html=True)
+    with c1:
+        st.markdown(f"""
+        <div class='metric-card'>
+            <h3>♻️ {botellas}</h3>
+            <small>Botellas Recicladas</small>
+        </div>
+        """, unsafe_allow_html=True)
+    with c2:
+        st.markdown(f"""
+        <div class='metric-card'>
+            <h3>🌳 {botellas*0.03:.1f}kg</h3>
+            <small>CO2 Ahorrado</small>
+        </div>
+        """, unsafe_allow_html=True)
 
-# --- ESCANEAR (IoT) ---
+# --- ESCANEAR ---
 elif selected == "Escanear":
     st.subheader("📡 Conexión IoT")
     st.info("Acércate a un contenedor inteligente")
@@ -144,11 +179,9 @@ elif selected == "Escanear":
             cant = random.randint(3, 12)
             puntos = cant * 0.5
             
-            # Actualizar Estado
             st.session_state.user['botellas'] += cant
             st.session_state.user['tokens'] += puntos
             
-            # Blockchain: Crear bloque
             prev = st.session_state.chain[-1]
             block = EcoBlock(len(st.session_state.chain), f"Reciclaje: {cant} PET", puntos, prev.hash)
             st.session_state.chain.append(block)
@@ -165,7 +198,14 @@ elif selected == "Mapa":
         'color': ['#2E7D32', '#2E7D32', '#FF0000', '#2E7D32']
     })
     st.map(map_data, zoom=12, color='color')
-    st.caption("🟢 Disponibles | 🔴 Llenos")
+    
+    # Leyenda manual
+    st.markdown("""
+    <div style="display:flex; justify-content:center; gap:20px; margin-top:10px;">
+        <span style="color:#2E7D32;">● Disponible</span>
+        <span style="color:#FF0000;">● Lleno</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # --- CANJEAR ---
 elif selected == "Canjear":
@@ -174,52 +214,56 @@ elif selected == "Canjear":
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("<div class='metric-card'><h1>🚌</h1><h4>Metrovía</h4><p style='color:green'>3.00 ECOG</p></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class='metric-card'>
+            <h1>🚌</h1>
+            <h4>Metrovía</h4>
+            <p style='color:#2E7D32; font-weight:bold;'>3.00 ECOG</p>
+        </div>
+        """, unsafe_allow_html=True)
         if st.button("Canjear Pasaje"):
             if st.session_state.user['tokens'] >= 3:
                 st.session_state.user['tokens'] -= 3
-                # Blockchain
                 prev = st.session_state.chain[-1]
                 st.session_state.chain.append(EcoBlock(len(st.session_state.chain), "Canje: Metro", -3.00, prev.hash))
-                st.success("¡Código QR Generado!")
+                st.success("¡QR Generado!")
             else:
                 st.error("Saldo insuficiente")
                 
     with col2:
-        st.markdown("<div class='metric-card'><h1>☕</h1><h4>Café</h4><p style='color:green'>8.00 ECOG</p></div>", unsafe_allow_html=True)
+        st.markdown("""
+        <div class='metric-card'>
+            <h1>☕</h1>
+            <h4>Café</h4>
+            <p style='color:#2E7D32; font-weight:bold;'>8.00 ECOG</p>
+        </div>
+        """, unsafe_allow_html=True)
         if st.button("Canjear Café"):
             if st.session_state.user['tokens'] >= 8:
                 st.session_state.user['tokens'] -= 8
-                # Blockchain
                 prev = st.session_state.chain[-1]
                 st.session_state.chain.append(EcoBlock(len(st.session_state.chain), "Canje: Café", -8.00, prev.hash))
                 st.success("¡Disfruta!")
             else:
                 st.error("Saldo insuficiente")
 
-# --- WALLET (MEJORADA) ---
+# --- WALLET ---
 elif selected == "Wallet":
     st.subheader("🔗 Billetera Blockchain")
     
-    # 1. Gráfico de Balance (Evolución)
     st.markdown("##### 📈 Evolución de Saldo")
-    
-    # Extraemos datos para el gráfico
     chart_data = []
     saldo_acumulado = 0
     for block in st.session_state.chain:
-        saldo_acumulado += block.amount if block.index > 0 else 12.50 # Ajuste para saldo inicial
+        saldo_acumulado += block.amount if block.index > 0 else 12.50
         chart_data.append({"Bloque": block.index, "Saldo": saldo_acumulado})
     
     st.line_chart(pd.DataFrame(chart_data).set_index("Bloque"))
 
-    # 2. Tabla de Transacciones (Ledger)
-    st.markdown("##### 📜 Libro Mayor Inmutable (Ledger)")
-    
+    st.markdown("##### 📜 Ledger de Transacciones")
     if len(st.session_state.chain) > 0:
-        # Preparamos DataFrame
         chain_data = []
-        for block in reversed(st.session_state.chain): # Orden inverso: más reciente primero
+        for block in reversed(st.session_state.chain):
             chain_data.append({
                 "ID": block.index,
                 "Fecha": block.timestamp,
@@ -229,23 +273,12 @@ elif selected == "Wallet":
             })
         
         df = pd.DataFrame(chain_data)
-        
-        # Mostramos DataFrame interactivo
         st.dataframe(
             df,
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Hash": st.column_config.TextColumn("Hash (Huella Digital)", help="Identificador único del bloque", width="small"),
-                "Monto": st.column_config.TextColumn("EcoTokens", width="small"),
+                "Hash": st.column_config.TextColumn("Hash", width="small"),
+                "Monto": st.column_config.TextColumn("Tokens", width="small"),
             }
-        )
-        
-        # Botón de Descarga
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            "📥 Descargar Historial (CSV)",
-            data=csv,
-            file_name="ecoguayaquil_ledger.csv",
-            mime="text/csv",
         )
